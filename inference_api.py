@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 import joblib
 import numpy as np
 
@@ -8,10 +8,10 @@ app = FastAPI(title="Churn Prediction API")
 model = joblib.load("model/churn_model.pkl")
 
 class CustomerData(BaseModel):
-    tenure: int
-    monthly_charges: float
-    total_charges: float
-    support_calls: int
+    tenure: int = Field(..., ge=0, le=120)
+    monthly_charges: float = Field(..., ge=0)
+    total_charges: float = Field(..., ge=0)
+    support_calls: int = Field(..., ge=0, le=50)
 
 @app.post("/predict")
 def predict_churn(data: CustomerData):
